@@ -1,5 +1,7 @@
 class Main extends hxd.App {
     public static var inst: Main;
+	
+	var gui: ui.BaseGUI;
 
     static function main() {
         new Main();
@@ -8,7 +10,7 @@ class Main extends hxd.App {
     override function init() {
         inst = this;
 
-        #if hl
+		#if hl
         hxd.res.Resource.LIVE_UPDATE = true;
         hxd.Res.initLocal();
         #else
@@ -17,9 +19,13 @@ class Main extends hxd.App {
 
         engine.backgroundColor = 0x6495ed;
         hxd.Window.getInstance().addEventTarget(onWindowEvent);
+		
+		gui = new ui.BaseGUI();
     }
 
     function onWindowEvent(ev:hxd.Event) {
+		gui.onWindowEvent(ev);
+
         switch (ev.kind) {
             case EPush:
             case ERelease:
@@ -47,13 +53,19 @@ class Main extends hxd.App {
     override function dispose() {
         super.dispose();
         hxd.Window.getInstance().removeEventTarget(onWindowEvent);
+
+		gui.dispose();
     }
 
     override function onResize() {
         super.onResize();
+
+		gui.onResize();
     }
 
-    override function update(deltaTime) {
+    override function update(deltaTime:Float) {
         super.update(deltaTime);
+
+		gui.update(deltaTime);
     }
 }
