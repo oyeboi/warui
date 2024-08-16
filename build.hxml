@@ -1,0 +1,22 @@
+# Source
+-cp src
+-main Main
+--debug
+
+# Libraries
+-lib castle
+-lib heaps
+-lib hscript
+-lib domkit
+-lib hlsdl
+
+# Build macros
+--macro DOMkit.setup()
+--macro include("ui", true)
+
+# Compiler declarations
+-D hscriptPos
+-D message-reporting=pretty
+
+# Output
+-hl bin/client.hl
