@@ -20,7 +20,7 @@ class Main extends hxd.App {
         engine.backgroundColor = 0x6495ed;
         hxd.Window.getInstance().addEventTarget(onWindowEvent);
 		
-		gui = new ui.BaseGUI();
+		gui = new ui.BaseGUI(s2d);
     }
 
     function onWindowEvent(ev:hxd.Event) {
