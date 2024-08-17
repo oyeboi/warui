@@ -1,0 +1,172 @@
+{
+	"sheets": [
+		{
+			"name": "data",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "uid"
+				},
+				{
+					"typeStr": "6:icons",
+					"name": "ref",
+					"kind": null
+				}
+			],
+			"lines": [
+				{
+					"ref": "DefaultCursor",
+					"uid": "defaultCur"
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "icons",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "uid"
+				},
+				{
+					"typeStr": "1",
+					"name": "name",
+					"opt": true,
+					"kind": null,
+					"editor": {
+						"categories": [
+							"icon"
+						]
+					}
+				},
+				{
+					"typeStr": "14",
+					"name": "gfx",
+					"kind": null
+				},
+				{
+					"typeStr": "17",
+					"name": "props",
+					"opt": true,
+					"kind": null
+				}
+			],
+			"lines": [
+				{
+					"gfx": {
+						"file": "tiles/cursors/pointer_a.png",
+						"size": 32,
+						"x": 0,
+						"y": 0
+					},
+					"uid": "DefaultCursor",
+					"props": {
+						"offsetX": 12,
+						"offsetY": 6
+					},
+					"name": ""
+				},
+				{
+					"gfx": {
+						"file": "tiles/cursors/hand_small_point.png",
+						"size": 32,
+						"x": 0,
+						"y": 0
+					},
+					"uid": "OverCursor",
+					"props": {
+						"offsetX": 0,
+						"offsetY": 0
+					}
+				},
+				{
+					"gfx": {
+						"file": "tiles/cursors/busy_hourglass.png",
+						"size": 32,
+						"x": 0,
+						"y": 0
+					},
+					"uid": "BusyCursor",
+					"props": {
+						"offsetX": 0,
+						"offsetY": 0
+					}
+				}
+			],
+			"separators": [],
+			"props": {
+				"editor": {
+					"categories": [
+						"icon"
+					]
+				},
+				"hasIndex": true,
+				"hasGroup": true
+			}
+		},
+		{
+			"name": "emotes",
+			"columns": [
+				{
+					"typeStr": "0",
+					"name": "uid",
+					"kind": null,
+					"scope": null
+				},
+				{
+					"typeStr": "14",
+					"name": "gfx",
+					"kind": null
+				}
+			],
+			"lines": [
+				{
+					"uid": "basic",
+					"gfx": {
+						"file": "tiles/emotes/pixel_style1.png",
+						"size": 16,
+						"x": 0,
+						"y": 0
+					}
+				},
+				{
+					"uid": "happy",
+					"gfx": {
+						"file": "tiles/emotes/pixel_style1.png",
+						"size": 16,
+						"x": 3,
+						"y": 1
+					}
+				}
+			],
+			"separators": [],
+			"props": {}
+		},
+		{
+			"name": "icons@props",
+			"props": {
+				"hide": true,
+				"isProps": true
+			},
+			"separators": [],
+			"lines": [],
+			"columns": [
+				{
+					"typeStr": "3",
+					"name": "offsetX",
+					"opt": true,
+					"kind": null
+				},
+				{
+					"typeStr": "3",
+					"name": "offsetY",
+					"opt": true,
+					"kind": null
+				}
+			]
+		}
+	],
+	"customTypes": [],
+	"compress": false
+}

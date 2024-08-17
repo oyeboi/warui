@@ -17,6 +17,9 @@ class Main extends hxd.App {
         hxd.Res.initEmbed();
         #end
 
+        // Parse CastleDB data
+        CastleDB.load(hxd.Res.data.entry.getText());
+
         engine.backgroundColor = 0x6495ed;
         hxd.Window.getInstance().addEventTarget(onWindowEvent);
 		
