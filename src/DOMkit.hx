@@ -6,6 +6,7 @@ class DOMkit {
         domkit.Macros.setDefaultParser("DOMkit.WaruiCssParser");
 
         domkit.Macros.registerComponentsPath("ui.$");
+        domkit.Macros.registerComponentsPath("ui.comp.$Comp");
     }
     #end
 }

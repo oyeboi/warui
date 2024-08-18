@@ -1,7 +1,7 @@
 class Const {
 
-    public static final REGULAR_UPDATE_DT: Int = 60;
-    
+    public static final REGULAR_UPDATE_DT: Float = 0.016667;
+
     // Font Sizes
     public static final SMALL_FONT_SIZE:Int = 8;
     public static final REG_FONT_SIZE:Int = 16;

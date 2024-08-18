@@ -17,6 +17,9 @@ class BaseGUI {
     static var cursorCache: haxe.ds.StringMap<hxd.Cursor.CustomCursor>;
     static var curNativeCursor: CastleDB.IconsKind;
 
+    var elements: Array<ui.comp.BaseElementComp>;
+    var tmpElements: Array<ui.comp.BaseElementComp>;
+
     var stage(default,null): h2d.Layers;
 
     public var lastKeyCode(default,null): Int;
@@ -25,7 +28,9 @@ class BaseGUI {
     var root: h2d.Flow;
 
     public function new(context:h2d.Layers) {
-        
+        elements = [];
+        tmpElements = [];
+
         lastKeyDown = false;
         lastKeyCode = -1;
         hideCursor = false;
@@ -221,6 +226,20 @@ class BaseGUI {
     public function update(dt:Float) {
         event.update(dt);
 
+        for (i in 0...elements.length) {
+            tmpElements.push(elements[i]);
+        }
+
+        for (i in 0...tmpElements.length) {
+            var e = tmpElements[i];
+            e.updateRec(dt);
+        }
+
+        var i = tmpElements.length;
+        while (i-- > 0) {
+            tmpElements.pop();
+        }
+        
         BaseGUI.style.sync();
     }
 }
