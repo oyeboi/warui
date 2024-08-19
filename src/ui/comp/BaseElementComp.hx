@@ -15,7 +15,7 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
 
     public var baseGUI(get,null): ui.BaseGUI;
 
-    var regUpdates: Array<()->Void>;
+    var regUpdates: Array<Void->Void>;
     var event: lib.WaitEvent;
     var registered: Bool;
     var lastUpdate: Float;
@@ -46,6 +46,15 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
      * Empty dummy method. Useful for resetting callbacks and function binds.
      */
     public final function emptyFunc() {}
+
+    /**
+     * Remove all binded callbacks.
+     */
+    public function clearBinds() {
+        regUpdates = null;
+        event = null;
+        lastUpdate = -1;
+    }
 
     /**
      * Add the current `BaseElementComp` to the GUI context.
@@ -104,6 +113,82 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
     }
 
     /**
+     * Delays a function `callback` by `delay` seconds.
+     * @param delay Second
+     * @param callback 
+     */
+     public function wait(delay:Float, callback:Void->Void) {
+        if (event == null) {
+            event = new lib.WaitEvent();
+            register();
+        }
+        event.wait(delay, callback);
+    }
+
+    /**
+     * Delays a function `callback` by `delay` frames.
+     * @param delay Frames
+     * @param callback Function
+     */
+     public function waitF(delay:Float, callback:Void->Void) {
+        wait(delay/Const.REGULAR_UPDATE_DT, callback);
+    }
+
+    /**
+     * Delays a function `callback` by `delay` milliseconds.
+     * @param delay Milliseconds
+     * @param callback Function
+     */
+    public function waitMS(delay:Float, callback:Void->Void) {
+        wait((delay/1000.0), callback);
+    }
+
+    /**
+     * Repeat a callback function each update until it returns true.
+     * @param callback 
+     */
+    public function waitUntil(callback:Float->Bool) {
+        if (event == null) {
+            event = new lib.WaitEvent();
+            register();
+        }
+        event.waitUntil(callback);
+    }
+
+    /**
+     * Binds a `callback` function to the WaitEvent loop indefinitely until cleared.
+     * @param callback Function to be invoked each frame.
+     */
+    public function bindUpdate(callback:Float->Void) {
+        if (lastUpdate < 0) {
+            throw "Calling bindUpdate() too late!";
+        }
+
+        waitUntil((dt)->{
+            callback(dt);
+            return false;
+        });
+    }
+
+    /**
+     * Binds a function `callback` to the update loop.
+     * The function is also immediately called once.
+     * @param callback 
+     */
+     public function bindCallback(callback:Void->Void) {
+        if (lastUpdate < 0) {
+            throw "Calling bind() too late!";
+        }
+
+        if (regUpdates == null) {
+            register();
+            regUpdates = new Array<Void->Void>();
+        }
+        regUpdates.push(callback);
+        callback();
+    }
+
+    /**
      * Executes all functions binded to the regular update loop.
      */
     function callBinds() {
@@ -120,7 +205,7 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
      * @param cl 
      * @return h2d.Object
      */
-     function getParent(cl:Class<BaseElementComp>): h2d.Object {
+    function getParent(cl:Class<BaseElementComp>): h2d.Object {
         var p = this.parent;
         while (p != null) {
             if (Std.isOfType(p, cl)) {
