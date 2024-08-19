@@ -123,7 +123,47 @@ class BaseGUI {
     }
 
     public function onWindowEvent(ev:hxd.Event) {
+        if (ev.kind == hxd.Event.EventKind.EKeyDown) {
+            if (ev.keyCode == lastKeyCode) {
+                lastKeyDown = false;
+                lastKeyCode = -1;
+            }
+        }
 
+        if (ev.kind == hxd.Event.EventKind.EKeyUp) {
+            if (ev.keyCode == lastKeyCode) {
+                return;
+            }
+            lastKeyDown = true;
+            lastKeyCode = ev.keyCode;
+        }
+
+        var dispatch = false;
+        switch (ev.kind) {
+            case EPush:
+                dispatch = true;
+            default:
+                // no op
+        }
+
+        if (dispatch) {
+            for (i in 0...elements.length) {
+                var elem = elements[i];
+                if (elem.dispatchRec(ev)) {
+                    return;
+                }
+            }
+
+            if (ev.kind == hxd.Event.EventKind.EPush) {
+                onKeyDown(ev);
+            }
+        }
+    }
+
+    function onKeyDown(ev:hxd.Event) {
+        if (ev.keyCode == hxd.Key.ESCAPE) {
+            
+        }
     }
 
     /**

@@ -256,6 +256,28 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
         }
     }
 
+    /**
+     * Recursively dispatch hxd.Event `ev` to all child elements.
+     * @param ev 
+     * @return Bool
+     */
+    public function dispatchRec(ev:hxd.Event): Bool {
+        if (childElements != null) {
+            for (i in 0...childElements.length) {
+                var c = childElements[i];
+                if (c.dispatchRec(ev)) {
+                    return true;
+                }
+            }
+        }
+        handleEvent(ev);
+        return true;
+    }
+
+    function handleEvent(ev:hxd.Event): Bool {
+        return false;
+    }
+
     function _update(dt:Float) {
         if (event != null) {
             event.update(dt);
