@@ -17,7 +17,7 @@ class BaseGUI {
     static var cursorCache: haxe.ds.StringMap<hxd.Cursor.CustomCursor>;
     static var curNativeCursor: CastleDB.IconsKind;
 
-    var elements: Array<ui.comp.BaseElementComp>;
+    public var elements: Array<ui.comp.BaseElementComp>;
     var tmpElements: Array<ui.comp.BaseElementComp>;
 
     var stage(default,null): h2d.Layers;
@@ -100,6 +100,9 @@ class BaseGUI {
      */
      public function loadStyle() {
         BaseGUI.style.load(hxd.Res.style);
+        #if debug
+        style.allowInspect = true;
+        #end
 
         // Set up fonts
         regularFontName = hxd.Res.fonts.Roboto_Regular.toFont().name;
@@ -225,6 +228,7 @@ class BaseGUI {
 
     public function update(dt:Float) {
         event.update(dt);
+        ui.comp.BaseElementComp.updateCounter = 0;
 
         for (i in 0...elements.length) {
             tmpElements.push(elements[i]);
@@ -239,8 +243,9 @@ class BaseGUI {
         while (i-- > 0) {
             tmpElements.pop();
         }
-        
-        BaseGUI.style.sync();
+
+        var s = BaseGUI.style.sync();
+        if (s > 0) trace(s);
     }
 }
 

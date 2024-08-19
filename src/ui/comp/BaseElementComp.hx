@@ -7,8 +7,11 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
     static var SRC = <base-element></base-element>;
 
     // @formatter:on
+    static var BLOCK_DRAW_REC: Bool;
+    static var BLOCK_SYNC: Bool;
     static var BLOCK_UPDATE_REC: Bool;
-    public static var updateCounter(default,null): Int;
+
+    public static var updateCounter: Int;
 
     public var baseGUI(get,null): ui.BaseGUI;
 
@@ -16,6 +19,7 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
     var event: lib.WaitEvent;
     var registered: Bool;
     var lastUpdate: Float;
+    var needRegister: Bool;
     var childElements: Array<BaseElementComp>;
     var removed: Bool;
     var regUpdateTimer: Float;
@@ -25,8 +29,12 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
     }
 
     public function new(?parent) {
+        regUpdateTimer = Math.random() * Const.REGULAR_UPDATE_DT;
+        removed = false;
         childElements = null;
+        needRegister = false;
         lastUpdate = -1;
+        registered = false;
         event = null;
         regUpdates = null;
 
@@ -40,6 +48,62 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
     public final function emptyFunc() {}
 
     /**
+     * Add the current `BaseElementComp` to the GUI context.
+     */
+    public function register() {
+        if (registered) {
+            return;
+        }
+
+        needRegister = true;
+        if (allocated) {
+            registered = true;
+            var p:BaseElementComp = cast getParent(BaseElementComp);
+            if (p != null) {
+                p.register();
+                if (p.childElements == null) {
+                    p.childElements = [this];
+                } else {
+                    if (childElements.indexOf(this) < 0) {
+                        p.childElements.push(this);
+                    }
+                }
+            } else {
+                baseGUI.elements.push(this);
+            }
+        }
+    }
+
+    /**
+     * Remove the current `BaseElementComp` from the GUI context.
+     */
+    function unregister() {
+        if (registered) {
+            var p = getParent(BaseElementComp);
+            if (p == null) {
+                baseGUI.elements.remove(this);
+            }
+        }
+        registered = false;
+    }
+
+    override function onAdd() {
+        super.onAdd();
+        if (needRegister) {
+            register();
+        }
+        removed = false;
+    }
+
+    override function onRemove() {
+        super.onRemove();
+        unregister();
+        removed = true;
+        
+        
+    }
+
+    /**
      * Executes all functions binded to the regular update loop.
      */
     function callBinds() {
@@ -49,6 +113,38 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
                 f();
             }
         }
+    }
+
+    /**
+     * Returns a `BaseElement` parent of class type `cl`.
+     * @param cl 
+     * @return h2d.Object
+     */
+     function getParent(cl:Class<BaseElementComp>): h2d.Object {
+        var p = this.parent;
+        while (p != null) {
+            if (Std.isOfType(p, cl)) {
+                return p;
+            }
+            p = p.parent;
+        }
+        return null;
+    }
+
+    /**
+     * Returns the most recent `BaseElement` child of class type `cl`.
+     * @param cl 
+     * @return h2d.Object
+     */
+    function getChild(cl:Class<BaseElementComp>): h2d.Object {
+        var i = children.length;
+        while (i-- > 0) {
+            var e = getChildAt(i);
+            if (Std.isOfType(e, cl)) {
+                return e;
+            }
+        }
+        return null;
     }
 
     /**
@@ -87,5 +183,19 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
             callBinds();
             regUpdateTimer += Const.REGULAR_UPDATE_DT;
         }
+    }
+
+    override function drawRec(ctx:h2d.RenderContext) {
+        if (BaseElementComp.BLOCK_DRAW_REC) {
+            return;
+        }
+        super.drawRec(ctx);
+    }
+
+    override function sync(ctx:h2d.RenderContext) {
+        if (BaseElementComp.BLOCK_SYNC) {
+            return;
+        }
+        super.sync(ctx);
     }
 }
