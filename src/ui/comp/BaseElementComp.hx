@@ -24,6 +24,9 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
     var removed: Bool;
     var regUpdateTimer: Float;
 
+    var autoClick: Bool;
+    var autoFocusing: Bool;
+
     inline function get_baseGUI():BaseGUI {
         return ui.BaseGUI.inst;
     }
@@ -42,10 +45,80 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
         initComponent();
     }
 
+
+    function getScrollContainer(): h2d.Flow {
+        var p = parent;
+        while (p != null) {
+            if (Std.isOfType(p, h2d.Flow)) {
+                var f:h2d.Flow = cast p;
+                if (f != null) {
+                    if (f.overflow == h2d.Flow.FlowOverflow.Scroll) {
+                        return f;
+                    }
+                }
+            }
+            p = p.parent;
+        }
+        return null;
+    }
+
+    function _onFocus() {
+        dom.focus = true;
+        if (!enableInteractive) {
+            return;
+        }
+
+        var scrollContent = getScrollContainer();
+        if (scrollContent != null) {
+            var mainElement:h2d.Object = this;
+            var p = this.parent;
+            while ((scrollContent != p) || (scrollContent != p.parent)) {
+                mainElement = p;
+                p = p.parent;
+            }
+
+            var height = mainElement.getSize().yMax - mainElement.getSize().yMin;
+            var padding = 50;
+            if ((mainElement.absY - padding) >= scrollContent.absY) {
+                scrollContent.scrollPosY -= (scrollContent.absY - (mainElement.absY - padding));
+            }
+            if ((scrollContent.absY + scrollContent.calculatedHeight) >= ((mainElement.absY + height) + padding)) {
+                scrollContent.scrollPosY += ((mainElement.absY + height) - (scrollContent.absY + scrollContent.calculatedHeight));
+            }
+        }
+        
+        reflow(); // ???
+        if (autoClick) {
+            var ev = new hxd.Event(hxd.Event.EventKind.EPush);
+            ev.button = hxd.Key.MOUSE_LEFT;
+            interactive.onClick(ev);
+        }
+        autoFocusing = false;
+        return;
+    }
+
+    function _onOver() {}
+    function _onOut() {}
+    function _onPush(ev:hxd.Event) {}
+    function _onRelease(ev:hxd.Event) {}
+
+
+
     /**
-     * Empty dummy method. Useful for resetting callbacks and function binds.
+     * Attempt to execute a click action.
+     * @return Bool
      */
-    public final function emptyFunc() {}
+    function tryClick(): Bool {
+        return false;
+    }
+
+    /**
+     * Attempt to execute a release action.
+     * @return Bool
+     */
+    function tryRelease(): Bool {
+        return false;
+    }
 
     /**
      * Remove all binded callbacks.

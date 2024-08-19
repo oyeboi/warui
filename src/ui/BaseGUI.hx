@@ -162,7 +162,7 @@ class BaseGUI {
 
     function onKeyDown(ev:hxd.Event) {
         if (ev.keyCode == hxd.Key.ESCAPE) {
-            
+
         }
     }
 
@@ -284,8 +284,7 @@ class BaseGUI {
             tmpElements.pop();
         }
 
-        var s = BaseGUI.style.sync();
-        if (s > 0) trace(s);
+        BaseGUI.style.sync();
     }
 }
 
