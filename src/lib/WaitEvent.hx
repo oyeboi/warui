@@ -6,46 +6,28 @@ class WaitEvent extends hxd.WaitEvent {
     }
 
     /**
-     * Delays a function `callback` by `delay` frames.
-     * @param delay Frames
-     * @param callback Function
-     */
-     public function waitF(delay:Float, callback:Void->Void) {
-        wait(delay/Const.REGULAR_UPDATE_DT, callback);
-    }
-
-    /**
-     * Delays a function `callback` by `delay` milliseconds.
-     * @param delay Milliseconds
-     * @param callback Function
-     */
-    public function waitMS(delay:Float, callback:Void->Void) {
-        wait(delay/1000, callback);
-    }
-
-    /**
-     * Repeat a callback function for a set interval of seconds. Callback will stop once it returns `true`.
-     * @param seconds 
-     * @param callback 
+     * Repeat a callback function for a set interval of `time`. Callback will stop once it returns `true`.
+     * @param time Length of interval in milliseconds 
+     * @param callback Function to invoked at each interval
      * @return Bool
      */
-    public function waitInterval(seconds:Float, callback:Float->Bool) {
-        seconds = (seconds < 0) ? 0.0 : seconds;
-        var acc:Float = 0.0;
+    public function waitInterval(time:Float, callback:Float->Bool) {
+        time = (time < 0) ? 0 : time;
+        var count:Float = 0.0;
         waitUntil((dt)->{
-            acc += dt;
-            if (acc < seconds) {
+            count += dt;
+            if (count < time) {
                 return false;
             }
             var ret = callback(dt);
-            acc -= seconds;
+            count -= time;
             return ret;
         });
     }
 
     /**
      * Repeats a callback function at the regular game loop update interveral (default 60 FPS).
-     * @param callback 
+     * @param callback Function to invoked each regular update
      */
     public function waitRegular(callback:Float->Bool) {
         waitInterval(Const.REGULAR_UPDATE_DT, callback);
@@ -53,16 +35,16 @@ class WaitEvent extends hxd.WaitEvent {
 
 
     /**
-     * Repeats a callback function each frame for a specifed amount of seconds.
-     * @param time 
-     * @param callback 
+     * Repeats a `callback `function each frame for a specifed amount of `time`.
+     * @param time Length of duration in milliseconds 
+     * @param callback Function to invoked each update
      */
     public function waitFor(time:Float, callback:Float->Bool) {
-        var acc = 0.0;
+        var count = 0.0;
         waitUntil((dt)->{
             callback(dt);
-            acc += dt;
-            return (acc >= time);
+            count += dt;
+            return (count >= time);
         });
     }
 
