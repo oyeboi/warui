@@ -6,9 +6,9 @@ class BaseGUI {
 
     // Fonts
     static var DEFAULT_FONTS_DEF: haxe.ds.StringMap<h2d.Font>;
-    var regularFontName(default,null): String;
-    var boldFontName(default,null): String;
-    var italicFontName(default,null): String;
+    static var regularFontName(default,null): String;
+    static var boldFontName(default,null): String;
+    static var italicFontName(default,null): String;
 
     var event: lib.WaitEvent;
 
@@ -19,8 +19,9 @@ class BaseGUI {
 
     public var elements: Array<ui.comp.BaseElementComp>;
     var tmpElements: Array<ui.comp.BaseElementComp>;
+    var windows: Array<ui.win.BaseWindow>;
 
-    var stage(default,null): h2d.Layers;
+    var canvas(default,null): h2d.Layers;
 
     public var lastKeyCode(default,null): Int;
     public var lastKeyDown(default,null): Bool;
@@ -30,13 +31,14 @@ class BaseGUI {
     public function new(context:h2d.Layers) {
         elements = [];
         tmpElements = [];
+        windows = [];
 
         lastKeyDown = false;
         lastKeyCode = -1;
         hideCursor = false;
         event = new lib.WaitEvent();
 
-        stage = context;
+        canvas = context;
 
         cursorCache = new haxe.ds.StringMap<hxd.Cursor.CustomCursor>();
         hxd.System.setCursor = setSystemCusor;
@@ -50,7 +52,7 @@ class BaseGUI {
         BaseGUI.style = new h2d.domkit.Style();
         BaseGUI.style.useSmartCache = true;
         BaseGUI.style.addObject(root);
-        stage.addChild(root);
+        canvas.addChild(root);
 
         loadStyle();
     }
@@ -162,7 +164,7 @@ class BaseGUI {
 
     function onKeyDown(ev:hxd.Event) {
         if (ev.keyCode == hxd.Key.ESCAPE) {
-
+        
         }
     }
 
@@ -261,6 +263,17 @@ class BaseGUI {
         // clear css
         BaseGUI.style.removeObject(root);
     }
+
+    public function setLayoutClasses(elem:ui.comp.BaseElementComp) {
+        // elem.dom.setClassKind("lang", Options.language);
+
+        elem.dom.setClassKind("build", Const.BUILD);
+
+        elem.dom.toggleClass("pad", isGamepadActive());
+        elem.dom.toggleClass("pc", !isGamepadActive());
+    }
+
+    public function refreshLayoutClasses() {}
 
     public function onResize() {
 
