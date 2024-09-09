@@ -100,7 +100,7 @@ class BaseGUI {
     /**
      * Loads the `style.css` resource for use.
      */
-     public function loadStyle() {
+     public static function loadStyle() {
         BaseGUI.style.load(hxd.Res.style);
         #if debug
         style.allowInspect = true;
@@ -164,7 +164,7 @@ class BaseGUI {
 
     function onKeyDown(ev:hxd.Event) {
         if (ev.keyCode == hxd.Key.ESCAPE) {
-        
+            
         }
     }
 
@@ -299,6 +299,32 @@ class BaseGUI {
 
         BaseGUI.style.sync();
     }
+
+    public static function loadFontFace(base:h2d.Font, ?variant:String): h2d.Font {
+        var fontName = switch(variant) {
+            case "bold":
+                BaseGUI.boldFontName;
+            case "italic":
+                BaseGUI.italicFontName;
+            default:
+                base.name;
+        };
+
+        if (BaseGUI.DEFAULT_FONTS_DEF.exists(fontName + "-" + base.size)) {
+            return BaseGUI.DEFAULT_FONTS_DEF.get(fontName + "-" + base.size);
+        }
+
+        return base;
+    }
+
+    public static function loadTextIcon(path:String): h2d.Tile {
+        if (path == null) {
+            return null;
+        }
+
+        return h2d.Tile.fromColor(0xff00ff, 8, 8);
+    }
+
 }
 
 class RootContainer extends h2d.Flow implements h2d.domkit.Object {
