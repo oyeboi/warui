@@ -4,11 +4,16 @@ enum GUIFonts {
 	Italic;
 }
 
-typedef TilePos = {
-    file:String, 
-    size:Int, 
-    x:Int, 
-    y:Int, 
-    width:Null<Int>, 
-    height:Null<Int>
-};
+enum EReason {
+    Do(f:Void->Void);
+    Success;
+    Invalid;
+    Multiple(a:Array<EReason>);
+    Cooldown(ms:Float);
+    Skip;
+    Dismiss;
+    
+    PlayerNotReady;
+    NotImplemented;
+    NotSupported;
+}
