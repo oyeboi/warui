@@ -45,7 +45,6 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
         initComponent();
     }
 
-
     function getScrollContainer(): h2d.Flow {
         var p = parent;
         while (p != null) {
@@ -101,8 +100,6 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
     function _onOut() {}
     function _onPush(ev:hxd.Event) {}
     function _onRelease(ev:hxd.Event) {}
-
-
 
     /**
      * Attempt to execute a click action.
@@ -244,11 +241,11 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
     }
 
     /**
-     * Binds a function `callback` to the update loop.
+     * Binds a function `callback` to a fixed interval unaffected by the update loop.
      * The function is also immediately called once.
      * @param callback 
      */
-     public function bindCallback(callback:Void->Void) {
+     public function bindRegular(callback:Void->Void) {
         if (lastUpdate < 0) {
             throw "Calling bind() too late!";
         }
@@ -359,7 +356,7 @@ class BaseElementComp extends h2d.Flow implements h2d.domkit.Object {
         BaseElementComp.updateCounter++;
         regUpdateTimer -= dt;
         if (regUpdateTimer <= 0) {
-            lastUpdate = #if sys Sys.time(); #else haxe.Timer.stamp(); #end
+            lastUpdate = Utils.time();
             callBinds();
             regUpdateTimer += Const.REGULAR_UPDATE_DT;
         }
