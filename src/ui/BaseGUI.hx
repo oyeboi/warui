@@ -1,5 +1,6 @@
 package ui;
 
+import Types;
 class BaseGUI {
     public static var inst(default,null): BaseGUI;
     public static var style(default,null): h2d.domkit.Style;
@@ -11,6 +12,11 @@ class BaseGUI {
     static var italicFontName(default,null): String;
 
     var event: lib.WaitEvent;
+
+    //GUI 
+    static var LAYER_TOOLTIP(default,null): Int = 2;
+    static var LAYER_CURSOR(default,null): Int = 3;
+    static var LAYER_OVER(default,null): Int = 3;
 
     // GUI Elements
     static var hideCursor: Bool;
@@ -24,6 +30,15 @@ class BaseGUI {
     var waitOverlay: h2d.Flow;
     var waitTimeout: Float;
     var windows: Array<ui.win.BaseWindow>;
+
+    // Tooltips
+    public var currentTooltip: ui.comp.TooltipComp;
+    public var additionalTooltips(default,null): Array<ui.comp.TooltipComp>;
+    public var lastTooltip(get,null): ui.comp.TooltipComp;
+    public var backTooltip(default,null): ui.comp.ElementComp;
+    var tooltipsFrozen: Bool;
+    public var freezeTooltips(get,default): Bool;
+    public var fadeTooltipsIn(get,default): Bool;
     
     var canvas(default,null): h2d.Layers;
 
@@ -35,8 +50,10 @@ class BaseGUI {
     public function new(context:h2d.Layers) {
         elements = [];
         tmpElements = [];
+        tooltipsFrozen = false;
         waitTimeout = 0;
         waitOverlay = null;
+        additionalTooltips = [];
 
         windows = [];
 
@@ -300,8 +317,89 @@ class BaseGUI {
             e.updateRec(dt);
         }
 
+        tooltipsFrozen = freezeTooltips;
+        if (!isGamepadActive()) {
+            if (hxd.Key.isPressed(hxd.Key.MOUSE_LEFT)) {
+                if (hasLockedTooltip()) {
+                    cleanTooltips();
+                }
+            }
+        }
+
         BaseGUI.style.sync();
     }
+
+    // #region - Tooltips
+    function get_fadeTooltipsIn(): Bool {
+        return true;
+    }
+
+    function get_freezeTooltips(): Bool {
+        return false;
+    }
+
+    public function get_lastTooltip(): ui.comp.TooltipComp {
+        if (additionalTooltips.length > 0) {
+            return additionalTooltips[additionalTooltips.length - 1];
+        }
+        return currentTooltip;
+    }
+
+    public function hasLockedTooltip(): Bool {
+        return false;
+    }
+
+    public function lockTooltip() {
+        if (backTooltip == null) {
+            
+            // blocking element
+            backTooltip = new ui.comp.ElementComp();
+            backTooltip.enableInteractive = true;
+            backTooltip.interactive.propagateEvents = false;
+
+            BaseGUI.style.addObject(backTooltip);
+            canvas.add(backTooltip, LAYER_TOOLTIP - 1);
+        }
+    }
+
+    public function setTooltip(elem:h2d.Object, anchor:h2d.Object, position:Types.TooltipPosition=Top, nesting=0): ui.comp.TooltipComp {
+        return null;
+    }
+
+    public function removeTooltip(anchor:h2d.Object): Bool {
+       
+        return false;
+    }
+
+    /**
+     * Remove all tooltips from the GUI.
+     */
+     public function cleanTooltips() {
+        for (i in 0...additionalTooltips.length) {
+            var ttip = additionalTooltips[i];
+            if (ttip != null) {
+                ttip.remove();
+            }
+            BaseGUI.style.removeObject(ttip);
+        }
+        additionalTooltips.resize(0);
+        
+        if (currentTooltip != null) {
+            currentTooltip.remove();
+        }
+        BaseGUI.style.removeObject(currentTooltip);
+        currentTooltip = null;
+        
+        if (backTooltip != null) {
+            backTooltip.remove();
+        }
+        BaseGUI.style.removeObject(backTooltip);
+        backTooltip = null;
+
+        clearAllRefs();
+    }
+
+    // #endregion
 
     // #region Windows
     function isWaiting(): Bool {
@@ -558,7 +656,7 @@ class BaseGUI {
 
         return h2d.Tile.fromColor(0xff00ff, 8, 8);
     }
-    
+
 }
 
 class RootContainer extends h2d.Flow implements h2d.domkit.Object {
