@@ -17,3 +17,17 @@ enum EReason {
     NotImplemented;
     NotSupported;
 }
+
+enum TooltipPosition {
+    Top;
+    Left;
+    Right;
+    Bottom;
+    TopLeft;
+    TopRight;
+    BottomLeft;
+    BottomRight;
+    TopAlignLeft;
+    LeftAlignTop;
+    TopAlignRight;
+}
