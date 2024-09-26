@@ -292,9 +292,7 @@ class BaseGUI {
 
     public function refreshLayoutClasses() {}
 
-    public function onResize() {
-
-    }
+    public function onResize() {}
 
     public function update(dt:Float) {
         event.update(dt);
@@ -329,6 +327,30 @@ class BaseGUI {
         BaseGUI.style.sync();
     }
 
+    // #region - References
+    public function initRefs(r:TooltipRefs) {
+        return r = {};
+    }
+
+    public function hasRefs(r:TooltipRefs): Bool {
+        return false;
+    }
+
+    public function mergeRefs(r1:TooltipRefs, r2:TooltipRefs) {
+        return r1;
+    }
+
+    public function clearCurrentRefs() {}
+    
+    public function clearAllRefs() {
+        skippedRefs = {};
+    }
+    public function removeRefRedundancy(r:TooltipRefs) {
+        return r;
+    }
+
+    // #endregion
+
     // #region - Tooltips
     function get_fadeTooltipsIn(): Bool {
         return true;
@@ -339,13 +361,27 @@ class BaseGUI {
     }
 
     public function get_lastTooltip(): ui.comp.TooltipComp {
-        if (additionalTooltips.length > 0) {
-            return additionalTooltips[additionalTooltips.length - 1];
+        if (additionalTooltips.length <= 0) {
+            return currentTooltip;
         }
-        return currentTooltip;
+        return additionalTooltips[additionalTooltips.length - 1];
     }
 
     public function hasLockedTooltip(): Bool {
+        if (currentTooltip != null) {
+            if (currentTooltip.toggleLock) {
+                return true;
+            }
+        }
+
+        var i = additionalTooltips.length;
+        while (i-- > 0) {
+            var tip = additionalTooltips[i];
+            if (tip.toggleLock) {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -362,12 +398,87 @@ class BaseGUI {
         }
     }
 
-    public function setTooltip(elem:h2d.Object, anchor:h2d.Object, position:Types.TooltipPosition=Top, nesting=0): ui.comp.TooltipComp {
-        return null;
+    public function setTooltip(elem:h2d.Object, anchor:h2d.Object, position:TooltipPosition=Top): ui.comp.TooltipComp {
+        var replace = false;
+        if ((lastTooltip != null) && (!lastTooltip.toggleLock)) {
+            replace = removeTooltip();
+        }
+        
+        var tip = new ui.comp.TooltipComp(elem);
+        tip.positionFromAnchor = position;
+        tip.anchor = anchor;
+
+        if ((lastTooltip == null) || !lastTooltip.toggleLock) {
+            currentTooltip = tip;
+        } else {
+            additionalTooltips.push(tip);
+        }
+
+        canvas.add(tip, BaseGUI.LAYER_TOOLTIP);
+        BaseGUI.style.addObject(tip);
+
+        if (!fadeTooltipsIn || replace) {
+            tip.alpha = 1.0;
+        }
+
+        var tipContent:ui.comp.TooltipComp = null; 
+        if (Std.isOfType(elem, ui.comp.TooltipComp)) {
+            tipContent = cast elem;
+            if (tipContent != null) {
+                var cls = tipContent.getTooltipClass();
+                if ((cls != null) && (cls != "")) {
+                    tipContent.dom.addClass(cls);
+                }
+            }
+        }
+
+        setLayoutClasses(tip);
+        mergeRefs(skippedRefs, currentTooltip.refs);
+        for (i in 0...additionalTooltips.length) {
+            var att = additionalTooltips[i];
+            if (att != tip) {
+                mergeRefs(skippedRefs, att.refs);
+            }
+        }
+        tip.refs = removeRefRedundancy(tip.refs);
+        return tip;
     }
 
     public function removeTooltip(anchor:h2d.Object): Bool {
-       
+        if (lastTooltip != null) {
+            if (lastTooltip.toggleLock) {
+                return false;
+            }
+
+            if (lastTooltip != currentTooltip) {
+                lastTooltip.remove();
+            }
+
+            BaseGUI.style.removeObject(lastTooltip);
+            additionalTooltips.remove(lastTooltip);
+            lastTooltip = null;
+            return true;
+        }
+
+        if (currentTooltip != null) {
+            if ((anchor == null) || 
+                ((currentTooltip.anchor == anchor) || (!Const.PREFS.keepTooltips))) {
+                for (i in 0...additionalTooltips.length) {
+                    var att = additionalTooltips[i];
+                    if (att != null) {
+                        att.remove();
+                    }
+                    BaseGUI.style.removeObject(att);
+                }
+
+                additionalTooltips.resize(0);
+                currentTooltip.remove();
+                BaseGUI.style.removeObject(currentTooltip);
+                currentTooltip = null;
+                clearAllRefs();
+                return true;
+            }
+        }
         return false;
     }
 
@@ -403,7 +514,7 @@ class BaseGUI {
 
     // #region Windows
     function isWaiting(): Bool {
-        return false;
+
     }
 
     function attachWindow(w:ui.win.BaseWindow) {}
