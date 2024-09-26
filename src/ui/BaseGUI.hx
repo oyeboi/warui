@@ -66,6 +66,8 @@ class BaseGUI {
 
         cursorCache = new haxe.ds.StringMap<hxd.Cursor.CustomCursor>();
         hxd.System.setCursor = setSystemCusor;
+        h2d.HtmlText.defaultLoadImage = loadTextIcon;
+        h2d.HtmlText.defaultFormatText = (s)->BaseGUI.formatText(s);
 
         // Create GUI root object for all subsequent UI elements.
         root = new RootContainer();
@@ -341,7 +343,7 @@ class BaseGUI {
     }
 
     public function clearCurrentRefs() {}
-    
+
     public function clearAllRefs() {
         skippedRefs = {};
     }
