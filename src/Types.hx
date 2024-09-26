@@ -31,3 +31,5 @@ enum TooltipPosition {
     LeftAlignTop;
     TopAlignRight;
 }
+
+typedef TooltipRefs = {};

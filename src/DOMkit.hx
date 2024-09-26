@@ -7,6 +7,7 @@ class DOMkit {
 
         domkit.Macros.registerComponentsPath("ui.$");
         domkit.Macros.registerComponentsPath("ui.comp.$Comp");
+        domkit.Macros.registerComponentsPath("ui.win.$");
     }
     #end
 }

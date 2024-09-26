@@ -10,4 +10,11 @@ class Const {
     // Custom Fonts
     public static final FONT_CUTIVE_MONO:String = "CutiveMono-Regular";
     public static final FONT_DANCING_SCRIPT:String = "DancingScript";
+
+    // Preferenecs
+    public static var PREFS: {
+        keepTooltips: Bool,
+    };
+
+    public static final BUILD: String = #if debug "dev" #else "release" #end;
 }

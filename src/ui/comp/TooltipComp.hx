@@ -69,7 +69,7 @@ class TooltipComp extends ui.comp.ElementComp {
         }
     }
 
-    override function sync(ctx:RenderContext) {
+    override function sync(ctx:h2d.RenderContext) {
         var mb = getSize();
         if (alpha < 1.0) {
             alpha += (10 * ctx.elapsedTime);

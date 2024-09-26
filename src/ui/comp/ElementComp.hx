@@ -32,7 +32,7 @@ class ElementComp extends ui.comp.BaseElementComp {
     public var onRelease(default,set): Void->Void;
 
     var pushed: Bool;
-    var hasHover: Bool;
+    public var hasHover(default,null): Bool;
 
     /**
      * Empty dummy method. Useful for resetting callbacks and function binds.
